@@ -1,0 +1,55 @@
+name: Daily LINE Log Analysis
+
+on:
+  schedule:
+    # 欏天台灣時間 22:00 (UTC) = 早太時間 10:00 (UTC+8)
+    - cron: '0 22 * * *'  
+  
+  workflow_dispatch:  # 允许手動觹诋
+    inputs:
+      analysis_date:
+        description: '分析日期 (YYYY-MM-DD)，畫话空则使用今天'
+        required: false
+        type: string
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ✅ Execute Recipe
+        run: |
+          ANALYSIS_DATE="${{ inputs.analysis_date }}"
+          
+          # 如果没有指定日期��使用今天
+          if [ -z "$ANALYSIS_DATE" ]; then
+            ANALYSIS_DATE=""
+          fi
+          
+          echo "📅 通行 Composio Recipe API.…"
+          echo "采改設別: $ANALYSIS_DATE"
+          
+          RESPONSE=$(curl -X POST \
+            "https://api.composio.dev/api/v1/recipes/rcp_EuvREySaVZ-r/execute" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: ${{ secrets.COMPOSIO_API_KEY }}" \
+            -s -w "\nHTTP Status: %{http_code}" \
+            -d '{
+              "spreadsheet_id": "123gBvBY9iTaC2Ym1GDbixjfYKJmIwAL0bV9U86bEc-c",
+              "sheet_name": "logs",
+              "recipient_email": "peterw@stu.edu.tw",
+              "analysis_date": "'"$ANALYSIS_DATE"'"
+            }')
+          
+          echo ""
+          echo "📧 API 雞懔回傳:"
+          echo "$RESPONSE"
+          
+          # 檢查是否成功
+          if echo "$RESPONSE" | grep -q "HTTP Status: 200"; then
+            echo "★️ 通行成功!"
+            exit 0
+          else
+            echo "❌️ 通过失赧"
+            exit 1
+          fi
