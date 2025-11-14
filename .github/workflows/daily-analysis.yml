@@ -1,14 +1,14 @@
 name: Daily LINE Log Analysis
 
 on:
-  schedule:
-    # 欏天台灣時間 22:00 (UTC) = 早太時間 10:00 (UTC+8)
-    - cron: '0 22 * * *'  
+  # 暫時停用自動排程 (Cron)
+  # schedule:
+  #   - cron: '0 22 * * *'  # 每天台灣時間 22:00 (UTC) = 日太時間 10:00 (UTC+8)
   
-  workflow_dispatch:  # 允许手動觹诋
+  workflow_dispatch:  # 保督手動覟虔功能
     inputs:
       analysis_date:
-        description: '分析日期 (YYYY-MM-DD)，畫话空则使用今天'
+        description: '分析日期 (YYYY-MM-DD)，畦空則使用今天'
         required: false
         type: string
 
@@ -21,13 +21,13 @@ jobs:
         run: |
           ANALYSIS_DATE="${{ inputs.analysis_date }}"
           
-          # 如果没有指定日期��使用今天
+          # 如果沒有指定查期，使用今天
           if [ -z "$ANALYSIS_DATE" ]; then
             ANALYSIS_DATE=""
           fi
           
-          echo "📅 通行 Composio Recipe API.…"
-          echo "采改設別: $ANALYSIS_DATE"
+          echo "📅 通行 Composio Recipe API…"
+          echo "采析謎別： $ANALYSIS_DATE"
           
           RESPONSE=$(curl -X POST \
             "https://api.composio.dev/api/v1/recipes/rcp_EuvREySaVZ-r/execute" \
@@ -42,7 +42,7 @@ jobs:
             }')
           
           echo ""
-          echo "📧 API 雞懔回傳:"
+          echo "📧 API 回懔回傳․"
           echo "$RESPONSE"
           
           # 檢查是否成功
